@@ -1,61 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import {
+    Box,
+    Typography,
     Card,
     CardMedia,
     CardContent,
-    Typography,
     Chip,
-    Box,
+    Fab,
+    Paper,
     FormControl,
     InputLabel,
     Select,
     MenuItem,
-    Fab,
-    CircularProgress,
-    Alert,
-    Paper,
-    Button,
-    Tooltip
+    useMediaQuery,
+    useTheme,
 } from '@mui/material';
-import { Add as AddIcon, FilterList as FilterIcon, Checkroom as CheckroomIcon } from '@mui/icons-material';
-import type { SelectChangeEvent } from '@mui/material';
+import { Add as AddIcon, Checkroom as CheckroomIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import type { SelectChangeEvent } from '@mui/material';
 import type { ClothingItem } from '../types';
-import { CATEGORIES } from '../types';
 import { dbService } from '../utils/database';
+import { CATEGORIES } from '../types';
 
 const ClothingList: React.FC = () => {
     const [clothingItems, setClothingItems] = useState<ClothingItem[]>([]);
-    const [filteredItems, setFilteredItems] = useState<ClothingItem[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     useEffect(() => {
         loadClothingItems();
     }, []);
 
-    useEffect(() => {
-        if (selectedCategory === 'all') {
-            setFilteredItems(clothingItems);
-        } else {
-            const filtered = clothingItems.filter(item => item.category === selectedCategory);
-            setFilteredItems(filtered);
-        }
-    }, [selectedCategory, clothingItems]);
-
     const loadClothingItems = async () => {
         try {
-            setLoading(true);
             const items = await dbService.getAllClothing();
             setClothingItems(items);
-            setFilteredItems(items);
-        } catch (err) {
-            setError('의류 목록을 불러오는데 실패했습니다.');
-            console.error('Failed to load clothing items:', err);
-        } finally {
-            setLoading(false);
+        } catch (error) {
+            console.error('옷장 목록을 불러오는데 실패했습니다:', error);
         }
     };
 
@@ -63,291 +47,280 @@ const ClothingList: React.FC = () => {
         setSelectedCategory(event.target.value);
     };
 
-    const handleItemClick = (id: string) => {
-        navigate(`/detail/${id}`);
+    const filteredItems = selectedCategory === 'all'
+        ? clothingItems
+        : clothingItems.filter(item => item.category === selectedCategory);
+
+    const getCategoryLabel = (category: string) => {
+        return CATEGORIES.find(cat => cat.value === category)?.label || category;
     };
-
-    const getCategoryLabel = (categoryValue: string) => {
-        const category = CATEGORIES.find(cat => cat.value === categoryValue);
-        return category ? category.label : categoryValue;
-    };
-
-    if (loading) {
-        return (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-                <CircularProgress size={60} thickness={4} />
-            </Box>
-        );
-    }
-
-    if (error) {
-        return (
-            <Alert severity="error" sx={{ mb: 2 }}>
-                {error}
-            </Alert>
-        );
-    }
 
     return (
-        <Box sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
+        <Box sx={{ width: '100%' }}>
             {/* 헤더 섹션 */}
-            <Box sx={{ mb: 4, mt: 2 }}>
+            <Box sx={{ mb: { xs: 2, sm: 3, md: 4 } }}>
                 <Typography
                     variant="h4"
-                    component="h1"
-                    gutterBottom
                     sx={{
-                        color: '#2c3e50',
+                        background: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
+                        backgroundClip: 'text',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
                         fontWeight: 700,
-                        mb: 1,
+                        mb: { xs: 1, sm: 2 },
+                        textAlign: { xs: 'center', sm: 'left' },
                     }}
                 >
                     내 옷장
                 </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                    총 {clothingItems.length}개의 의류가 등록되어 있습니다
+                <Typography
+                    variant="body1"
+                    sx={{
+                        color: 'text.secondary',
+                        mb: { xs: 2, sm: 3 },
+                        textAlign: { xs: 'center', sm: 'left' },
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                    }}
+                >
+                    총 {clothingItems.length}개의 옷이 있습니다
                 </Typography>
 
-                {/* 카테고리 필터 - 별도 라인으로 분리 */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#2c3e50' }}>
-                        카테고리:
-                    </Typography>
-                    <Paper
-                        elevation={0}
-                        sx={{
-                            p: 2,
-                            background: 'rgba(255, 255, 255, 0.9)',
-                            backdropFilter: 'blur(10px)',
-                            border: '1px solid #e0e0e0',
-                            borderRadius: 3,
-                            minWidth: 200,
-                        }}
-                    >
-                        <FormControl fullWidth>
-                            <InputLabel sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <FilterIcon fontSize="small" />
-                                선택
-                            </InputLabel>
-                            <Select
-                                value={selectedCategory}
-                                label="선택"
-                                onChange={handleCategoryChange}
-                                sx={{ borderRadius: 2 }}
-                            >
-                                <MenuItem value="all">전체 ({clothingItems.length})</MenuItem>
-                                {CATEGORIES.map((category) => {
-                                    const count = clothingItems.filter(item => item.category === category.value).length;
-                                    return (
-                                        <MenuItem key={category.value} value={category.value}>
-                                            {category.label} ({count})
-                                        </MenuItem>
-                                    );
-                                })}
-                            </Select>
-                        </FormControl>
-                    </Paper>
-                </Box>
+                {/* 카테고리 필터 */}
+                <Paper
+                    sx={{
+                        p: { xs: 1.5, sm: 2 },
+                        background: 'rgba(255, 255, 255, 0.8)',
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        borderRadius: 2,
+                        maxWidth: { xs: '100%', sm: 300 },
+                        mx: { xs: 'auto', sm: 0 },
+                    }}
+                >
+                    <FormControl fullWidth size={isSmallMobile ? 'small' : 'medium'}>
+                        <InputLabel
+                            sx={{
+                                fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                                color: 'text.secondary'
+                            }}
+                        >
+                            카테고리별 보기
+                        </InputLabel>
+                        <Select
+                            value={selectedCategory}
+                            label="카테고리별 보기"
+                            onChange={handleCategoryChange}
+                            sx={{
+                                fontSize: { xs: '0.875rem', sm: '1rem' },
+                                '& .MuiSelect-select': {
+                                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                                },
+                            }}
+                        >
+                            <MenuItem value="all">전체</MenuItem>
+                            {CATEGORIES.map((category) => (
+                                <MenuItem key={category.value} value={category.value}>
+                                    {category.label}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Paper>
             </Box>
 
-            {/* 빈 화면 또는 의류 목록 */}
+            {/* 옷장 목록 */}
             {filteredItems.length === 0 ? (
                 <Paper
-                    elevation={0}
                     sx={{
+                        p: { xs: 3, sm: 4, md: 6 },
                         textAlign: 'center',
-                        py: 8,
-                        px: 4,
-                        background: 'rgba(255, 255, 255, 0.9)',
+                        background: 'rgba(255, 255, 255, 0.8)',
                         backdropFilter: 'blur(10px)',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: 4,
-                        maxWidth: 500,
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        borderRadius: 3,
+                        maxWidth: { xs: '100%', sm: 500 },
                         mx: 'auto',
                     }}
                 >
-                    {/* 일러스트 추가 */}
                     <Box
                         sx={{
-                            width: 120,
-                            height: 120,
-                            borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
                             display: 'flex',
+                            flexDirection: 'column',
                             alignItems: 'center',
-                            justifyContent: 'center',
-                            mx: 'auto',
-                            mb: 3,
-                            opacity: 0.8,
+                            gap: { xs: 2, sm: 3 },
                         }}
                     >
-                        <CheckroomIcon sx={{ fontSize: 48, color: 'white' }} />
+                        <Box
+                            sx={{
+                                width: { xs: 80, sm: 100, md: 120 },
+                                height: { xs: 80, sm: 100, md: 120 },
+                                borderRadius: '50%',
+                                background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                            }}
+                        >
+                            <CheckroomIcon
+                                sx={{
+                                    fontSize: { xs: '2.5rem', sm: '3rem', md: '3.5rem' },
+                                    color: 'text.secondary',
+                                }}
+                            />
+                        </Box>
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                color: 'text.primary',
+                                fontWeight: 600,
+                                fontSize: { xs: '1.125rem', sm: '1.25rem' },
+                            }}
+                        >
+                            아직 등록된 옷이 없습니다
+                        </Typography>
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                color: 'text.secondary',
+                                fontSize: { xs: '0.875rem', sm: '1rem' },
+                                maxWidth: 300,
+                            }}
+                        >
+                            첫 번째 옷을 추가해서 나만의 디지털 옷장을 만들어보세요!
+                        </Typography>
+                        <Box
+                            component="button"
+                            onClick={() => navigate('/add')}
+                            sx={{
+                                mt: { xs: 1, sm: 2 },
+                                px: { xs: 2, sm: 3 },
+                                py: { xs: 1, sm: 1.5 },
+                                background: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: 2,
+                                fontSize: { xs: '0.875rem', sm: '1rem' },
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                transition: 'all 0.3s ease-in-out',
+                                boxShadow: '0 4px 12px rgba(44, 62, 80, 0.3)',
+                                '&:hover': {
+                                    transform: 'translateY(-2px)',
+                                    boxShadow: '0 8px 24px rgba(44, 62, 80, 0.4)',
+                                },
+                            }}
+                        >
+                            첫 번째 옷 추가하기
+                        </Box>
                     </Box>
-
-                    {/* 강조된 메시지 */}
-                    <Typography
-                        variant="h6"
-                        sx={{
-                            color: '#2c3e50',
-                            fontWeight: 600,
-                            mb: 2
-                        }}
-                    >
-                        {selectedCategory === 'all' ? '등록된 옷이 없습니다.' : '해당 카테고리의 옷이 없습니다.'}
-                    </Typography>
-
-                    <Typography
-                        variant="body1"
-                        sx={{
-                            mb: 4,
-                            color: '#2c3e50',
-                            textDecoration: 'underline',
-                            cursor: 'pointer',
-                            '&:hover': {
-                                color: '#34495e',
-                            }
-                        }}
-                        onClick={() => navigate('/add')}
-                    >
-                        새로운 옷을 추가해보세요!
-                    </Typography>
-
-                    <Button
-                        variant="contained"
-                        startIcon={<AddIcon />}
-                        onClick={() => navigate('/add')}
-                        sx={{
-                            borderRadius: 3,
-                            px: 4,
-                            py: 1.5,
-                            fontSize: '1.1rem',
-                            fontWeight: 600,
-                        }}
-                    >
-                        첫 번째 옷 추가하기
-                    </Button>
                 </Paper>
             ) : (
-                <Box sx={{
-                    display: 'grid',
-                    gridTemplateColumns: {
-                        xs: '1fr',
-                        sm: 'repeat(2, 1fr)',
-                        md: 'repeat(3, 1fr)',
-                        lg: 'repeat(4, 1fr)'
-                    },
-                    gap: 3,
-                    maxWidth: 1200,
-                    mx: 'auto',
-                }}>
-                    {filteredItems.map((item, index) => (
+                <Box className="clothing-grid">
+                    {filteredItems.map((item) => (
                         <Card
                             key={item.id}
                             sx={{
                                 cursor: 'pointer',
                                 transition: 'all 0.3s ease-in-out',
-                                animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`,
-                                maxWidth: 350,
-                                mx: 'auto',
+                                maxWidth: '100%',
                                 '&:hover': {
-                                    transform: 'translateY(-8px) scale(1.02)',
-                                    boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
-                                },
-                                '@keyframes fadeInUp': {
-                                    '0%': {
-                                        opacity: 0,
-                                        transform: 'translateY(30px)',
-                                    },
-                                    '100%': {
-                                        opacity: 1,
-                                        transform: 'translateY(0)',
-                                    },
+                                    transform: 'translateY(-4px)',
+                                    boxShadow: '0 12px 32px rgba(0, 0, 0, 0.15)',
                                 },
                             }}
-                            onClick={() => handleItemClick(item.id)}
+                            onClick={() => navigate(`/detail/${item.id}`)}
                         >
                             <CardMedia
                                 component="img"
-                                height="250"
+                                height={isSmallMobile ? 200 : isMobile ? 240 : 280}
                                 image={item.imageUrl}
                                 alt={getCategoryLabel(item.category)}
                                 sx={{
                                     objectFit: 'cover',
-                                    transition: 'transform 0.3s ease-in-out',
-                                    '&:hover': {
-                                        transform: 'scale(1.05)',
-                                    }
+                                    borderBottom: '1px solid #f0f0f0',
                                 }}
                             />
-                            <CardContent sx={{ p: 3 }}>
+                            <CardContent
+                                sx={{
+                                    p: { xs: 1.5, sm: 2 },
+                                }}
+                            >
                                 <Typography
                                     variant="h6"
-                                    component="div"
-                                    gutterBottom
-                                    sx={{ fontWeight: 600, mb: 2, color: '#2c3e50' }}
+                                    sx={{
+                                        fontWeight: 600,
+                                        mb: 1,
+                                        fontSize: { xs: '1rem', sm: '1.125rem' },
+                                        lineHeight: 1.3,
+                                    }}
                                 >
                                     {getCategoryLabel(item.category)}
                                 </Typography>
-                                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        flexWrap: 'wrap',
+                                        gap: { xs: 0.5, sm: 1 },
+                                        mb: 1,
+                                    }}
+                                >
                                     <Chip
-                                        label={item.size}
-                                        size="small"
+                                        label={getCategoryLabel(item.category)}
                                         color="primary"
+                                        size={isSmallMobile ? 'small' : 'medium'}
                                         sx={{
-                                            borderRadius: 2,
-                                            fontWeight: 600,
+                                            fontSize: { xs: '0.625rem', sm: '0.75rem' },
                                         }}
                                     />
                                     <Chip
                                         label={item.color}
-                                        size="small"
                                         variant="outlined"
+                                        size={isSmallMobile ? 'small' : 'medium'}
                                         sx={{
-                                            borderRadius: 2,
-                                            borderColor: '#2c3e50',
-                                            color: '#2c3e50',
+                                            fontSize: { xs: '0.625rem', sm: '0.75rem' },
                                         }}
                                     />
                                 </Box>
-                                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                    구입일: {new Date(item.buyDate).toLocaleDateString('ko-KR')}
+                                <Typography
+                                    variant="body2"
+                                    sx={{
+                                        color: 'text.secondary',
+                                        fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                                    }}
+                                >
+                                    {item.shop} • {item.size}
                                 </Typography>
-                                {item.shop && (
-                                    <Typography variant="body2" color="text.secondary">
-                                        구입처: {item.shop}
-                                    </Typography>
-                                )}
                             </CardContent>
                         </Card>
                     ))}
                 </Box>
             )}
 
-            {/* 플로팅 액션 버튼 - 툴팁 추가 */}
-            <Tooltip
-                title="옷 추가하기"
-                placement="left"
-                arrow
+            {/* 플로팅 액션 버튼 */}
+            <Fab
+                color="primary"
+                aria-label="add"
+                onClick={() => navigate('/add')}
+                sx={{
+                    position: 'fixed',
+                    bottom: { xs: 16, sm: 24 },
+                    right: { xs: 16, sm: 24 },
+                    width: { xs: 56, sm: 64 },
+                    height: { xs: 56, sm: 64 },
+                    boxShadow: '0 8px 24px rgba(44, 62, 80, 0.3)',
+                    '&:hover': {
+                        transform: 'scale(1.1)',
+                        boxShadow: '0 12px 32px rgba(44, 62, 80, 0.4)',
+                    },
+                }}
             >
-                <Fab
-                    color="primary"
-                    aria-label="add"
+                <AddIcon
                     sx={{
-                        position: 'fixed',
-                        bottom: 24,
-                        right: 24,
-                        width: 56,
-                        height: 56,
-                        transition: 'all 0.3s ease-in-out',
-                        '&:hover': {
-                            transform: 'scale(1.1) rotate(90deg)',
-                        }
+                        fontSize: { xs: '1.5rem', sm: '1.75rem' }
                     }}
-                    onClick={() => navigate('/add')}
-                >
-                    <AddIcon />
-                </Fab>
-            </Tooltip>
+                />
+            </Fab>
         </Box>
     );
 };

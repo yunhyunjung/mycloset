@@ -1,96 +1,199 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  --font-base: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+  --text-color: #2e2e2e;
+  --bg-color: #fefefe;
+  --primary-color: #64b5f6;
+  --accent-color: #ffd54f;
+  --card-bg: #ffffff;
+  --border-radius: 12px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --transition-speed: 0.3s ease;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  font-family: var(--font-base);
+  color: var(--text-color);
+  background-color: var(--bg-color);
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
-a:hover {
-  color: #535bf2;
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  background: linear-gradient(135deg, #fdfcfb 0%, #f6f8f9 100%);
+  transition: background var(--transition-speed), color var(--transition-speed);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
 }
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 0.5rem;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vanilla:hover {
-  filter: drop-shadow(0 0 2em #3178c6aa);
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color var(--transition-speed);
 }
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+a:hover {
+  color: #42a5f5;
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 0.8em 1.2em;
+  background-color: var(--primary-color);
+  color: #fff;
+  font-weight: 500;
+  box-shadow: var(--shadow);
+  transition: all var(--transition-speed);
+  font-size: 14px;
+  min-height: 44px;
+  min-width: 44px;
 }
 
-@media (prefers-color-scheme: light) {
+button:hover {
+  background-color: #42a5f5;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(100, 181, 246, 0.3);
+}
+
+/* 카드형 UI */
+.card {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 1rem;
+  margin-bottom: 0.8rem;
+  transition: box-shadow var(--transition-speed);
+}
+
+.card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 옷장 목록 그리드 - 모바일 최적화 */
+.clothing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem;
+  width: 100%;
+  padding: 0.5rem;
+}
+
+/* 갤럭시 폴드 등 작은 화면 */
+@media (max-width: 360px) {
+  .clothing-grid {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    font-size: 12px;
   }
-  a:hover {
-    color: #747bff;
+
+  body {
+    font-size: 12px;
   }
+
   button {
-    background-color: #f9f9f9;
+    font-size: 12px;
+    padding: 0.6em 1em;
+  }
+}
+
+/* 일반 모바일 */
+@media (min-width: 361px) and (max-width: 480px) {
+  .clothing-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+  }
+}
+
+/* 큰 모바일 */
+@media (min-width: 481px) and (max-width: 768px) {
+  .clothing-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  :root {
+    font-size: 15px;
+  }
+
+  body {
+    font-size: 15px;
+  }
+}
+
+/* 스크롤바 */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}
+
+/* 터치 디바이스 최적화 */
+@media (hover: none) and (pointer: coarse) {
+
+  button,
+  a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+    /* iOS 줌 방지 */
+  }
+
+  .card {
+    padding: 0.8rem;
+  }
+}
+
+/* 다크모드 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-color: #f1f1f1;
+    --bg-color: #1e1e1e;
+    --card-bg: #2a2a2a;
+    --primary-color: #90caf9;
+  }
+
+  body {
+    background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+  }
+
+  a:hover {
+    color: #bbdefb;
   }
 }

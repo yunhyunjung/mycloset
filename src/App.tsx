@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { Container, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import Header from './components/Header';
 import ClothingList from './pages/ClothingList';
 import AddClothing from './pages/AddClothing';
@@ -45,15 +45,24 @@ const theme = createTheme({
         h4: {
             fontWeight: 700,
             color: '#2c3e50',
+            fontSize: 'clamp(1.5rem, 4vw, 2.125rem)',
         },
         h6: {
             fontWeight: 600,
             color: '#2c3e50',
+            fontSize: 'clamp(1rem, 3vw, 1.25rem)',
+        },
+        body1: {
+            fontSize: 'clamp(0.875rem, 2.5vw, 1rem)',
+        },
+        body2: {
+            fontSize: 'clamp(0.75rem, 2vw, 0.875rem)',
         },
     },
     shape: {
         borderRadius: 12,
     },
+
     components: {
         MuiCard: {
             styleOverrides: {
@@ -74,7 +83,8 @@ const theme = createTheme({
                     borderRadius: 8,
                     textTransform: 'none',
                     fontWeight: 600,
-                    padding: '10px 24px',
+                    padding: 'clamp(8px, 2vw, 10px) clamp(16px, 4vw, 24px)',
+                    fontSize: 'clamp(0.75rem, 2.5vw, 0.875rem)',
                 },
                 contained: {
                     background: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
@@ -115,6 +125,7 @@ const theme = createTheme({
             styleOverrides: {
                 root: {
                     borderRadius: 6,
+                    fontSize: 'clamp(0.625rem, 2vw, 0.75rem)',
                 },
                 colorPrimary: {
                     backgroundColor: '#2c3e50',
@@ -123,6 +134,32 @@ const theme = createTheme({
                 outlined: {
                     borderColor: '#2c3e50',
                     color: '#2c3e50',
+                },
+            },
+        },
+        MuiTextField: {
+            styleOverrides: {
+                root: {
+                    '& .MuiInputLabel-root': {
+                        fontSize: 'clamp(0.75rem, 2.5vw, 0.875rem)',
+                    },
+                    '& .MuiInputBase-input': {
+                        fontSize: 'clamp(0.875rem, 2.5vw, 1rem)',
+                    },
+                },
+            },
+        },
+        MuiSelect: {
+            styleOverrides: {
+                root: {
+                    fontSize: 'clamp(0.875rem, 2.5vw, 1rem)',
+                },
+            },
+        },
+        MuiFormControlLabel: {
+            styleOverrides: {
+                label: {
+                    fontSize: 'clamp(0.75rem, 2.5vw, 0.875rem)',
                 },
             },
         },
@@ -152,22 +189,44 @@ function App() {
                     }}
                 >
                     <Header />
-                    <Container
-                        maxWidth="lg"
+                    <Box
                         sx={{
-                            py: 4,
+                            py: {
+                                xs: 1,
+                                sm: 2,
+                                md: 3,
+                                lg: 4
+                            },
+                            px: {
+                                xs: 0.5,
+                                sm: 1,
+                                md: 2,
+                                lg: 3
+                            },
                             position: 'relative',
                             zIndex: 1,
+                            maxWidth: '100%',
+                            mx: 'auto',
                         }}
                     >
                         <Box
                             sx={{
                                 background: 'rgba(255, 255, 255, 0.95)',
                                 backdropFilter: 'blur(10px)',
-                                borderRadius: 3,
-                                p: 3,
+                                borderRadius: {
+                                    xs: 1,
+                                    sm: 2,
+                                    md: 3
+                                },
+                                p: {
+                                    xs: 1,
+                                    sm: 2,
+                                    md: 3
+                                },
                                 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
                                 border: '1px solid rgba(255, 255, 255, 0.2)',
+                                maxWidth: '100%',
+                                mx: 'auto',
                             }}
                         >
                             <Routes>
@@ -177,7 +236,7 @@ function App() {
                                 <Route path="/detail/:id" element={<ClothingDetail />} />
                             </Routes>
                         </Box>
-                    </Container>
+                    </Box>
                 </Box>
             </Router>
         </ThemeProvider>

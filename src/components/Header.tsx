@@ -1,154 +1,114 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box, Avatar } from '@mui/material';
-import { Add as AddIcon, Home as HomeIcon, Checkroom as CheckroomIcon } from '@mui/icons-material';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Button, Avatar, Box, useMediaQuery, useTheme } from '@mui/material';
+import { Link, useLocation } from 'react-router-dom';
+import CheckroomIcon from '@mui/icons-material/Checkroom';
 
 const Header: React.FC = () => {
-    const navigate = useNavigate();
     const location = useLocation();
+    const theme = useTheme();
 
-    const isHome = location.pathname === '/' || location.pathname === '/list';
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+    const isActive = (path: string) => location.pathname === path;
 
     return (
         <AppBar
             position="static"
-            elevation={0}
             sx={{
                 background: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(10px)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
             }}
         >
-            <Toolbar sx={{ px: { xs: 2, md: 4 } }}>
-                <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        cursor: 'pointer',
-                        transition: 'transform 0.2s ease-in-out',
-                        '&:hover': { transform: 'scale(1.05)' }
-                    }}
-                    onClick={() => navigate('/')}
-                >
+            <Toolbar
+                sx={{
+                    px: { xs: 1, sm: 2, md: 3 },
+                    py: { xs: 0.5, sm: 1 },
+                    minHeight: { xs: 48, sm: 56, md: 64 },
+                    justifyContent: 'space-between',
+                }}
+            >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
                     <Avatar
                         sx={{
-                            mr: 2,
-                            background: 'linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%)',
-                            boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                            bgcolor: 'rgba(255, 255, 255, 0.2)',
+                            width: { xs: 32, sm: 40, md: 48 },
+                            height: { xs: 32, sm: 40, md: 48 },
                         }}
                     >
-                        <CheckroomIcon />
+                        <CheckroomIcon
+                            sx={{
+                                fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' },
+                                color: 'white'
+                            }}
+                        />
                     </Avatar>
                     <Typography
-                        variant="h5"
-                        component="div"
+                        variant="h6"
                         sx={{
+                            fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' },
                             fontWeight: 700,
-                            color: '#ffffff',
-                            textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                            color: 'white',
+                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
                         }}
                     >
                         MyCloset
                     </Typography>
                 </Box>
 
-                <Box sx={{ flexGrow: 1 }} />
-
-                <Box sx={{ display: 'flex', gap: 1 }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        gap: { xs: 0.5, sm: 1, md: 2 },
+                        flexDirection: { xs: 'row', sm: 'row' },
+                    }}
+                >
                     <Button
-                        color="inherit"
-                        startIcon={<HomeIcon />}
-                        onClick={() => navigate('/')}
-                        variant={isHome ? 'contained' : 'text'}
+                        component={Link}
+                        to="/"
                         sx={{
-                            borderRadius: 3,
-                            px: 3,
-                            py: 1,
-                            backgroundColor: isHome ? 'rgba(255,255,255,0.2)' : 'transparent',
-                            backdropFilter: isHome ? 'blur(10px)' : 'none',
-                            border: isHome ? '2px solid rgba(255,255,255,0.3)' : '2px solid transparent',
-                            position: 'relative',
-                            transition: 'all 0.3s ease-in-out',
-                            fontWeight: isHome ? 700 : 500,
-                            color: '#ffffff',
+                            color: 'white',
+                            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                            px: { xs: 1, sm: 1.5, md: 2 },
+                            py: { xs: 0.5, sm: 0.75 },
+                            minWidth: { xs: 'auto', sm: 'auto' },
+                            textDecoration: isActive('/') ? 'underline' : 'none',
+                            textUnderlineOffset: '4px',
                             '&:hover': {
-                                backgroundColor: 'rgba(255,255,255,0.15)',
-                                transform: 'translateY(-2px)',
-                                boxShadow: '0 8px 16px rgba(0,0,0,0.3)',
-                                '&::after': {
-                                    content: '""',
-                                    position: 'absolute',
-                                    bottom: -2,
-                                    left: '50%',
-                                    transform: 'translateX(-50%)',
-                                    width: '60%',
-                                    height: 3,
-                                    background: 'rgba(255,255,255,0.8)',
-                                    borderRadius: 2,
-                                }
+                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                textDecoration: 'underline',
+                                textUnderlineOffset: '4px',
                             },
-                            '&::after': isHome ? {
-                                content: '""',
-                                position: 'absolute',
-                                bottom: -2,
-                                left: '50%',
-                                transform: 'translateX(-50%)',
-                                width: '60%',
-                                height: 3,
-                                background: 'rgba(255,255,255,0.8)',
-                                borderRadius: 2,
-                            } : {},
+                            ...(isActive('/') && {
+                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.1)',
+                            }),
                         }}
                     >
-                        옷장
+                        {isSmallMobile ? '목록' : '옷장 목록'}
                     </Button>
-
                     <Button
-                        color="inherit"
-                        startIcon={<AddIcon />}
-                        onClick={() => navigate('/add')}
-                        variant={location.pathname === '/add' ? 'contained' : 'text'}
+                        component={Link}
+                        to="/add"
                         sx={{
-                            borderRadius: 3,
-                            px: 3,
-                            py: 1,
-                            backgroundColor: location.pathname === '/add' ? 'rgba(255,255,255,0.2)' : 'transparent',
-                            backdropFilter: location.pathname === '/add' ? 'blur(10px)' : 'none',
-                            border: location.pathname === '/add' ? '2px solid rgba(255,255,255,0.3)' : '2px solid transparent',
-                            position: 'relative',
-                            transition: 'all 0.3s ease-in-out',
-                            fontWeight: location.pathname === '/add' ? 700 : 500,
-                            color: '#ffffff',
+                            color: 'white',
+                            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                            px: { xs: 1, sm: 1.5, md: 2 },
+                            py: { xs: 0.5, sm: 0.75 },
+                            minWidth: { xs: 'auto', sm: 'auto' },
+                            textDecoration: isActive('/add') ? 'underline' : 'none',
+                            textUnderlineOffset: '4px',
                             '&:hover': {
-                                backgroundColor: 'rgba(255,255,255,0.15)',
-                                transform: 'translateY(-2px)',
-                                boxShadow: '0 8px 16px rgba(0,0,0,0.3)',
-                                '&::after': {
-                                    content: '""',
-                                    position: 'absolute',
-                                    bottom: -2,
-                                    left: '50%',
-                                    transform: 'translateX(-50%)',
-                                    width: '60%',
-                                    height: 3,
-                                    background: 'rgba(255,255,255,0.8)',
-                                    borderRadius: 2,
-                                }
+                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                textDecoration: 'underline',
+                                textUnderlineOffset: '4px',
                             },
-                            '&::after': location.pathname === '/add' ? {
-                                content: '""',
-                                position: 'absolute',
-                                bottom: -2,
-                                left: '50%',
-                                transform: 'translateX(-50%)',
-                                width: '60%',
-                                height: 3,
-                                background: 'rgba(255,255,255,0.8)',
-                                borderRadius: 2,
-                            } : {},
+                            ...(isActive('/add') && {
+                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.1)',
+                            }),
                         }}
                     >
-                        옷 추가
+                        {isSmallMobile ? '추가' : '옷 추가'}
                     </Button>
                 </Box>
             </Toolbar>
