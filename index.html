@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyCloset - 개인 옷장 관리</title>
+
+  <!-- PWA 설정 -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#1976d2" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="MyCloset" />
+  <link rel="apple-touch-icon" href="/icon-192x192.png" />
+
+  <!-- 메타 태그 -->
+  <meta name="description" content="개인용 옷장 디지털 정리 웹앱" />
+  <meta name="keywords" content="옷장, 의류, 코디, 패션, 관리" />
+</head>
+
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.tsx"></script>
+
+  <!-- 서비스 워커 등록 -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('SW registered: ', registration);
+          })
+          .catch((registrationError) => {
+            console.log('SW registration failed: ', registrationError);
+          });
+      });
+    }
+  </script>
+</body>
+
+</html>

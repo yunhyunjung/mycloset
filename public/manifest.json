@@ -1,0 +1,30 @@
+{
+    "name": "MyCloset - 개인 옷장 관리",
+    "short_name": "MyCloset",
+    "description": "개인용 옷장 디지털 정리 웹앱",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#1976d2",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": [
+        "lifestyle",
+        "productivity"
+    ],
+    "lang": "ko",
+    "dir": "ltr"
+}
